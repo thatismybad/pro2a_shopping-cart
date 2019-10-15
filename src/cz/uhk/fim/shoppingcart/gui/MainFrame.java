@@ -7,13 +7,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainFrame extends JFrame {
 
     private ShoppingCart shoppingCart = new ShoppingCart();
-    private JTextArea areaContent;
+    private JTable table;
+    private ShoppingCartTableModel model;
 
     public MainFrame() {
         initFrame();
@@ -28,25 +28,31 @@ public class MainFrame extends JFrame {
         txtInputItem.setToolTipText("Zadej název položky...");
         JButton btnInputAdd = new JButton("Přidat");
 
-//        JTextArea areaContent = new JTextArea();
-        areaContent = new JTextArea();
-        areaContent.setEditable(false);
+        table = new JTable();
+        model = new ShoppingCartTableModel();
+        model.setShoppingCart(shoppingCart);
+        table.setModel(model);
+
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.add(new JScrollPane(table));
 
         pnlInput.add(lblInputTitle, BorderLayout.WEST);
         pnlInput.add(txtInputItem, BorderLayout.CENTER);
         pnlInput.add(btnInputAdd, BorderLayout.EAST);
 
         add(pnlInput, BorderLayout.NORTH);
-        add(areaContent, BorderLayout.CENTER);
+        add(tablePanel, BorderLayout.CENTER);
+
+        // TODO dodelat UI - pridat prvky pro cenu za ks, pocet ks, celkovou cenu vseho + cenu vybranych polozek
 
         btnInputAdd.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 String input = txtInputItem.getText().trim();
                 String[] parsedInput = input.split(";");
-                CartItem item = new CartItem(parsedInput[0], Double.parseDouble(parsedInput[1]));
+                CartItem item = new CartItem(parsedInput[0], Double.parseDouble(parsedInput[1]), 1);
                 shoppingCart.addItem(item);
-                areaContent.setText(prepareContent(shoppingCart.getAllItems()));
+                model.setShoppingCart(shoppingCart);
                 txtInputItem.setText("");
             }
         });
@@ -70,27 +76,4 @@ public class MainFrame extends JFrame {
         }
         return sb.toString();
     }
-
-    private void prepareContent(List<CartItem> list, JTextArea area) {
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < list.size(); i++) {
-            sb.append(list.get(i).getTitle());
-            if (i != list.size() - 1) {
-                sb.append(", \n");
-            }
-        }
-        area.setText(sb.toString());
-    }
-
-    private void prepareContentGlobal(List<CartItem> list) {
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < list.size(); i++) {
-            sb.append(list.get(i).getTitle());
-            if (i != list.size() - 1) {
-                sb.append(", \n");
-            }
-        }
-        areaContent.setText(sb.toString());
-    }
-
 }

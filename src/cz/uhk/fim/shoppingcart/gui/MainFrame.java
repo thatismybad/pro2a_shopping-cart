@@ -1,6 +1,7 @@
 package cz.uhk.fim.shoppingcart.gui;
 
 import cz.uhk.fim.shoppingcart.model.CartItem;
+import cz.uhk.fim.shoppingcart.model.ShoppingCart;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public class MainFrame extends JFrame {
 
-    private List<CartItem> itemList = new ArrayList<>();
+    private ShoppingCart shoppingCart = new ShoppingCart();
     private JTextArea areaContent;
 
     public MainFrame() {
@@ -41,10 +42,11 @@ public class MainFrame extends JFrame {
         btnInputAdd.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-//                areaContent.setText(txtInputItem.getText().trim());
-                itemList.add(new CartItem(txtInputItem.getText().trim()));
-                areaContent.setText(prepareContent(itemList));
-                prepareContent(itemList, areaContent);
+                String input = txtInputItem.getText().trim();
+                String[] parsedInput = input.split(";");
+                CartItem item = new CartItem(parsedInput[0], Double.parseDouble(parsedInput[1]));
+                shoppingCart.addItem(item);
+                areaContent.setText(prepareContent(shoppingCart.getAllItems()));
                 txtInputItem.setText("");
             }
         });
@@ -61,7 +63,7 @@ public class MainFrame extends JFrame {
     private String prepareContent(List<CartItem> list) {
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < list.size(); i++) {
-            sb.append(list.get(i).getTitle());
+            sb.append(String.format("název: %s - cena: %.2f", list.get(i).getTitle(), list.get(i).getPricePerPiece()));
             if (i != list.size() - 1) {
                 sb.append(", \n");
             }

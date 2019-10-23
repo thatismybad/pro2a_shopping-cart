@@ -5,25 +5,58 @@ import cz.uhk.fim.shoppingcart.model.ShoppingCart;
 
 import javax.swing.table.AbstractTableModel;
 
+/**
+ * Table model for our shopping cart
+ */
 public class ShoppingCartTableModel extends AbstractTableModel {
+
+    /**
+     * Definition of interface for listening changes on purchase checkbox
+     */
+    interface CellCheckChangedListener {
+        void onPurchaseUpdate();
+    }
+
+    private CellCheckChangedListener cellCheckChangedListener;
 
     private ShoppingCart shoppingCart;
 
-    public void setShoppingCart(ShoppingCart shoppingCart) {
+    /**
+     * Method for initial setting/update of table with shopping cart data + passing listener from main frame windows
+     * @param shoppingCart
+     * @param cellCheckChangedListener
+     */
+    public void setShoppingCart(ShoppingCart shoppingCart, CellCheckChangedListener cellCheckChangedListener) {
         this.shoppingCart = shoppingCart;
+        this.cellCheckChangedListener = cellCheckChangedListener;
+        // method for update of table data
         fireTableDataChanged();
     }
 
+    /**
+     * Method for getting row count of table
+     * @return number of items in shopping cart
+     */
     @Override
     public int getRowCount() {
         return shoppingCart.getCount();
     }
 
+    /**
+     * Method for getting number of columns
+     * @return 5 columns
+     */
     @Override
     public int getColumnCount() {
         return 5;
     }
 
+    /**
+     * Method for getting value of specific cell in row and column
+     * @param rowIndex which row
+     * @param columnIndex which column
+     * @return specific data (and data type)
+     */
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         CartItem item = shoppingCart.getItem(rowIndex);
@@ -43,6 +76,12 @@ public class ShoppingCartTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Method for setting value of specific cell in row and column
+     * @param aValue new updated value
+     * @param rowIndex which row
+     * @param columnIndex which column
+     */
     @Override
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
         CartItem item = shoppingCart.getItem(rowIndex);
@@ -58,12 +97,19 @@ public class ShoppingCartTableModel extends AbstractTableModel {
                 break;
             case 4:
                 item.setPurchased((Boolean) aValue);
+                // when if checkbox updated - we call onPurchaseUpdate method for update of label in another class
+                cellCheckChangedListener.onPurchaseUpdate();
                 break;
             default:
                 break;
         }
     }
 
+    /**
+     * Method for getting name of columns
+     * @param column which column
+     * @return name of column
+     */
     @Override
     public String getColumnName(int column) {
         switch (column) {
@@ -82,6 +128,11 @@ public class ShoppingCartTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Method for getting data type of specific column
+     * @param columnIndex which column
+     * @return data type of column
+     */
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         switch (columnIndex) {
@@ -99,8 +150,15 @@ public class ShoppingCartTableModel extends AbstractTableModel {
         }
     }
 
+    /**
+     * Method for setting which cell/row/column should be editable
+     * @param rowIndex which row
+     * @param columnIndex which column
+     * @return should be editable?
+     * - we don't want to allow editing of "subtotal" column
+     */
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return true;
+        return columnIndex != 3;
     }
 }

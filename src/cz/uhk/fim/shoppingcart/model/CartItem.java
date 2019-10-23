@@ -1,11 +1,14 @@
 package cz.uhk.fim.shoppingcart.model;
 
+/**
+ * Class represents item in shopping cart
+ */
 public class CartItem {
 
-    private String title;
-    private double pricePerPiece;
-    private int numberOfPieces;
-    private boolean isPurchased;
+    private String title; // name of item
+    private double pricePerPiece; // price per piece
+    private int numberOfPieces; // number of pieces
+    private boolean isPurchased; // is item purchased?
 
     public CartItem() {
     }
